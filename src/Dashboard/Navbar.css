@@ -1,0 +1,14 @@
+.btnactive {
+  border: none;
+  outline: none;
+  cursor: pointer;
+  color: black;
+  font-weight: bolder;
+  text-decoration: none;
+}
+
+.active {
+  color: #23809fc2;
+}
+
+

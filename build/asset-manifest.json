@@ -1,0 +1,29 @@
+{
+  "files": {
+    "main.css": "/static/css/main.8ee3c56e.css",
+    "main.js": "/static/js/main.2c515836.js",
+    "static/media/thar.png": "/static/media/thar.6c3ff18b049253df20cf.png",
+    "static/media/benz.jpg": "/static/media/benz.71f0de418c698a9186be.jpg",
+    "static/media/bc-car.jpg": "/static/media/bc-car.4e546d6e1706e5d34147.jpg",
+    "static/media/kiacarnival.jpg": "/static/media/kiacarnival.40931ed9770f15ccf307.jpg",
+    "static/media/nexon.jpg": "/static/media/nexon.3b25b28a734c04da1367.jpg",
+    "static/media/punch.jpg": "/static/media/punch.3e693769a0af017c066d.jpg",
+    "static/media/seltos.jpg": "/static/media/seltos.21785bb258666b844d92.jpg",
+    "static/media/harrier.jpg": "/static/media/harrier.dd07bffe8c8178b0563c.jpg",
+    "static/media/Safari.jpg": "/static/media/Safari.695a4ac732ee6bb06728.jpg",
+    "static/media/verna.jpg": "/static/media/verna.92235379ec5282f37bcc.jpg",
+    "static/media/Skoda.jpg": "/static/media/Skoda.3fc3014dbbd46adbd07f.jpg",
+    "static/media/Innova.jpg": "/static/media/Innova.924ae3fdbe53193c7237.jpg",
+    "static/media/kia.jpg": "/static/media/kia.c211d526b2ce5d31f7b7.jpg",
+    "static/media/ks-rental.jpeg": "/static/media/ks-rental.40edbf21805adccaf29c.jpeg",
+    "static/media/xuv.jpg": "/static/media/xuv.78ac7431fd877b9561e1.jpg",
+    "static/media/logoo.jpg": "/static/media/logoo.e6c4d6c916afbb546b84.jpg",
+    "index.html": "/index.html",
+    "main.8ee3c56e.css.map": "/static/css/main.8ee3c56e.css.map",
+    "main.2c515836.js.map": "/static/js/main.2c515836.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.8ee3c56e.css",
+    "static/js/main.2c515836.js"
+  ]
+}
