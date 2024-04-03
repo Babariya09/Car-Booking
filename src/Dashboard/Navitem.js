@@ -21,7 +21,6 @@ export const Navitem = [
     title: "Driver",
     path: "/driver",
   },
-
   {
     title: "Book Now",
     path: "/Book",

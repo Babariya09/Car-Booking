@@ -152,7 +152,21 @@ function DrawerAppBar(props) {
                 <NavLink to="/team" className="btnactive">
                   Team
                 </NavLink>
-              </Button> <Button
+              </Button>
+              <Button
+                key="Driver"
+                className="hover"
+                sx={{
+                  color: "black",
+                  textTransform: "none",
+                  display: { xs: "none", sm: "block" },
+                }}
+              >
+                <NavLink to="/driverregister" className="btnactive">
+                  Driver
+                </NavLink>
+              </Button>
+              <Button
                 key="Book"
                 className="hover"
                 sx={{
