@@ -17,18 +17,20 @@ const theme = createTheme();
 export default function DriverRegister() {
   const navigate = useNavigate();
   const [user, setUser] = useState({
-    name: "",
+    driver: "",
     email: "",
     state: "",
-    licenseNumber: "",
-    phoneNumber: "",
+    licence: "",
+    phone: "",
+    alternativePhone: "", // New optional field
   });
   const [valid, setValid] = useState({
-    name: true,
+    driver: true,
     email: true,
     state: true,
-    licenseNumber: true,
-    phoneNumber: true,
+    licence: true,
+    phone: true,
+    alternativePhone: true,
   });
   const [emailSuccess, setEmailSuccess] = useState(false);
   const [formError, setFormError] = useState(false);
@@ -41,10 +43,10 @@ export default function DriverRegister() {
     });
 
     // Perform validation for phone number length
-    if (name === "phoneNumber") {
+    if (name === "phone" || name === "alternativePhone") {
       setValid({
         ...valid,
-        phoneNumber: value.length === 10,
+        [name]: value.length === 10 || value.length === 0, // Optional field
       });
     }
 
@@ -112,13 +114,13 @@ export default function DriverRegister() {
             margin="normal"
             required
             fullWidth
-            id="name"
-            label="Name"
-            name="name"
-            autoComplete="name"
+            id="driver"
+            label="Driver"
+            name="driver"
+            autoComplete="driver"
             autoFocus
             onChange={handleChange}
-            value={user.name}
+            value={user.driver}
           />
           <TextField
             margin="normal"
@@ -137,15 +139,28 @@ export default function DriverRegister() {
             margin="normal"
             required
             fullWidth
-            id="phoneNumber"
+            id="phone"
             label="Phone Number"
-            name="phoneNumber"
-            autoComplete="phoneNumber"
+            name="phone"
+            autoComplete="phone"
             type="number"
             onChange={handleChange}
-            value={user.phoneNumber}
-            error={!valid.phoneNumber}
-            helperText={!valid.phoneNumber && "Phone Number must be 10 digits"}
+            value={user.phone}
+            error={!valid.phone}
+            helperText={!valid.phone && "Phone Number must be 10 digits"}
+          />
+          <TextField
+            margin="normal"
+            fullWidth
+            id="alternativePhone"
+            label="Alternative Phone Number"
+            name="alternativePhone"
+            autoComplete="alternativePhone"
+            type="number"
+            onChange={handleChange}
+            value={user.alternativePhone}
+            error={!valid.alternativePhone}
+            helperText={!valid.alternativePhone && "Phone Number must be 10 digits or leave empty"}
           />
           <TextField
             margin="normal"
@@ -162,12 +177,12 @@ export default function DriverRegister() {
             margin="normal"
             required
             fullWidth
-            id="licenseNumber"
+            id="licence"
             label="Licence Number"
-            name="licenseNumber"
-            autoComplete="licenseNumber"
+            name="licence"
+            autoComplete="licence"
             onChange={handleChange}
-            value={user.licenseNumber}
+            value={user.licence}
           />
           <Button
             type="submit"

@@ -64,11 +64,13 @@ export default function BookData() {
         <Table sx={{ minWidth: 300 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell align="left" style={{ backgroundColor: "#23809fc2" }} >Car Brand</TableCell>
+              <TableCell align="left" style={{ backgroundColor: "#23809fc2" }} >Car Image</TableCell>
               <TableCell align="left" style={{ backgroundColor: "#23809fc2" }} >Car Name</TableCell>
               <TableCell align="left" style={{ backgroundColor: "#23809fc2" }} >Plat Number</TableCell>
-              <TableCell align="left" style={{ backgroundColor: "#23809fc2" }} >Edit</TableCell>
-              <TableCell align="left" style={{ backgroundColor: "#23809fc2" }} >Delete</TableCell>
+              <TableCell align="left" style={{ backgroundColor: "#23809fc2" }} >Car Type</TableCell>
+              <TableCell align="left" style={{ backgroundColor: "#23809fc2" }} >Fuel Type</TableCell>
+              <TableCell align="left" style={{ backgroundColor: "#23809fc2" }} >price Per Hour</TableCell>
+              <TableCell align="left" style={{ backgroundColor: "#23809fc2" }} >Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -76,20 +78,21 @@ export default function BookData() {
               <TableRow
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
+                <TableCell align="left"><img src={row.image} alt="Car Image" style={{ width: "60px", height: "60px", borderRadius: "100%" }} /></TableCell>
                 <TableCell align="left">{row.carname}</TableCell>
-                <TableCell align="left">{row.carbrand}</TableCell>
+                <TableCell align="left">{row.carType}</TableCell>
+                <TableCell align="left">{row.fuelType}</TableCell>
+                <TableCell align="left">{row.pricePerHour}</TableCell>
                 <TableCell align="left">{row.platnumber}</TableCell>
                 <TableCell align="left">
                   <button
-                    style={{ width: "80px", borderRadius: "8px" }}
+                    style={{ width: "80px", borderRadius: "8px", border: 0, padding: "10px 5px", background: "#84dd84", color: "#fff", marginRight: "10px" }}
                     onClick={() => UpdateUser(row._id)}
                   >
                     Edit
                   </button>
-                </TableCell>
-                <TableCell align="left">
                   <button
-                    style={{ width: "80px", borderRadius: "8px" }}
+                    style={{ width: "80px", borderRadius: "8px", border: 0, padding: "10px 5px", background: "#ff5f5f", color: "#fff" }}
                     onClick={() => DeleteUser(row._id)}
                   >
                     Delete

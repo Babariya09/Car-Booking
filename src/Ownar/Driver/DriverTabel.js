@@ -34,11 +34,17 @@ export default function DriverTabel() {
         fetchData();
     }, []);
 
-    const DeleteUser = (id) => {
-        axios.delete(`http://localhost:8000/api/Driverdelete/${id}`);
-        window.alert("Data Deleted SuccessFully");
-        fetchData();
+    const DeleteUser = async (id) => {
+        if (window.confirm("Are You Sure!") == true) {
+            await axios.delete(`http://localhost:8000/api/Driverdelete/${id}`);
+            fetchData();
+        }
     };
+
+    const AcceptUser = async (id) => {
+        await axios.post(`http://localhost:8000/api/AcceptDriver/${id}`);
+    }
+
     const onSubmit = () => {
         navigate("/Driver")
     }
@@ -85,10 +91,16 @@ export default function DriverTabel() {
                                 <TableCell align="left">{row.state}</TableCell>
                                 <TableCell align="left">
                                     <button
-                                        style={{ width: "80px", borderRadius: "8px" }}
+                                        style={{ width: "80px", borderRadius: "8px", border: 0, padding: "10px 5px", background: "#84dd84", color: "#fff", marginRight: "10px" }}
+                                        onClick={() => AcceptUser(row._id)}
+                                    >
+                                        Accept
+                                    </button>
+                                    <button
+                                        style={{ width: "80px", borderRadius: "8px", border: 0, padding: "10px 5px", background: "#ff5f5f", color: "#fff" }}
                                         onClick={() => DeleteUser(row._id)}
                                     >
-                                        Delete
+                                        Reject
                                     </button>
                                 </TableCell>
                             </TableRow>

@@ -1,318 +1,200 @@
-import React, { useState, useEffect } from 'react';
-import OwnerNavbar from "../Navbar/OwnerNavbar";
-import Footer from "../../Dashboard/Footer";
-import axios from "axios";
-import Grid from "@mui/material/Grid";
-import { Box } from "@mui/system";
-import { makeStyles } from "@mui/styles";
-import TextField from "@mui/material/TextField";
+import React, { useState } from "react";
+import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-const useStyles = makeStyles((theme) => ({
-    us: {
-        fontSize: "35px",
-    },
-    we: {
-        padding: "20px",
-    },
-    color: {
-        backgroundColor: "#23809fc2",
-        textAlign: "center",
-        fontWeight: "bold",
-        color: "white",
-        padding: "30px",
-    },
-    car: {
-        fontSize: "25px",
-        textAlign: "center",
-        fontWeight: "bold",
-        marginTop: "25px",
-    },
-    form: {
-        padding: "10px 60px 10px 60px",
-    },
-}));
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+const theme = createTheme();
 
 export default function Driver() {
-    const navigate = useNavigate();
-    const [data2, setData2] = useState([]);
-    useEffect(() => {
-        const fetchData = async () => {
-            const [response2] = await Promise.all([
-                axios.get("http://localhost:8000/api/Statedata"),
-            ]);
-            setData2(response2.data);
-        };
-        fetchData();
-    }, []);
+  const navigate = useNavigate();
+  const [user, setUser] = useState({
+    driver: "",
+    email: "",
+    state: "",
+    licence: "",
+    phone: "",
+    alternativePhone: "", // New optional field
+  });
+  const [valid, setValid] = useState({
+    driver: true,
+    email: true,
+    state: true,
+    licence: true,
+    phone: true,
+    alternativePhone: true,
+  });
+  const [emailSuccess, setEmailSuccess] = useState(false);
+  const [formError, setFormError] = useState(false);
 
-    const classes = useStyles();
-    const [comment, setComment] = useState({
-        driver: "",
-        phone: "",
-        alternativephone: "",
-        email: "",
-        state: "",
-        licence: "",
-
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUser({
+      ...user,
+      [name]: value,
     });
-    const [valid, setValid] = useState({});
-    const [hide, setHide] = useState({});
-    const oninput = (e) => {
-        const { name, value } = e.target;
-        setComment((pre) => ({
-            ...pre,
-            [name]: value,
-        }));
-        setValid(true);
-        setHide(true);
-    };
 
-    const onSubmit = () => {
-        if (comment.driver === "") {
-            setValid((...valid) => ({ ...valid, driver: true }));
-            return;
+    // Perform validation for phone number length
+    if (name === "phone" || name === "alternativePhone") {
+      setValid({
+        ...valid,
+        [name]: value.length === 10 || value.length === 0, // Optional field
+      });
+    }
+
+    // Perform validation for email format
+    if (name === "email") {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      setValid({
+        ...valid,
+        email: emailRegex.test(value),
+      });
+    }
+  };
+
+  const handleSubmit = () => {
+    // Perform validation here before submitting
+    // Example: checking if all required fields are filled
+    const isValid = Object.values(valid).every(value => value) &&
+      Object.values(user).every(value => value.trim() !== "");
+    if (!isValid) {
+      setFormError(true);
+      return;
+    }
+
+    axios
+      .post("http://localhost:8000/api/Driver", user)
+      .then((res) => {
+        console.log(res.data.message);
+        toast.success("Registration successful");
+        navigate("/DriverTabel");
+      })
+      .catch((error) => {
+        if (error.response && error.response.data && error.response.data.message === "Email already exists") {
+          toast.error("Email already exists");
+        } else {
+          toast.error("Registration failed");
         }
+        console.error("Error registering user:", error);
+      });
+  };
 
-        var IndNum = /^[0]?[6789]\d{9}$/;
-        if (comment.phone === "") {
-            setValid((...valid) => ({ ...valid, phone: true }));
-            return;
-        } else if (!IndNum.test(comment.phone)) {
-            setValid((...valid) => ({ ...valid, phone: true }));
-            return;
-        }
-
-        if (comment.alternativephone === "") {
-            setValid((...valid) => ({ ...valid, alternativephone: true }));
-            return;
-        } else if (!IndNum.test(comment.alternativephone)) {
-            setValid((...valid) => ({ ...valid, alternativephone: true }));
-            return;
-        } else if (comment.alternativephone === comment.phone) {
-            setHide((...hide) => ({ ...hide, alternativephone: true }));
-            return;
-        }
-
-        var filter =
-            /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-        if (comment.email === "") {
-            setValid((...valid) => ({ ...valid, email: true }));
-            return;
-        } else if (!filter.test(comment.email)) {
-            setHide((...hide) => ({ ...hide, email: true }));
-            return;
-        }
-        if (comment.state === "") {
-            setValid((...valid) => ({ ...valid, state: true }));
-            return;
-        }
-
-        if (comment.licence === "") {
-            setValid((...valid) => ({ ...valid, licence: true }));
-            return;
-        }
-
-        axios
-            .post("http://localhost:8000/api/Driver", comment)
-            .then((res) => console.log(res.data.message));
-        navigate("/DriverTabel")
-
-
-    };
-    return (
-        <>
-            <title>Driver Details - Speedo Car Rental</title>
-            <OwnerNavbar />
-            <Box className={classes.car}>ENTER DRIVER DETAILS</Box>
-            <Grid className={classes.form}>
-                <Box style={{ fontWeight: "400", fontSize: "20px" }}> Driver Name*</Box>
-                <TextField
-                    name="driver"
-                    value={comment.driver}
-                    placeholder="Driver Name"
-                    fullWidth
-                    onChange={oninput}
-                />
-                {valid.driver == true && (
-                    <span
-                        style={{
-                            color: "red",
-                            fontWeight: "bold",
-                            fontSize: "15px",
-                            display: "flex",
-                            justifyContent: "center",
-                        }}
-                    >
-                        Enter Driver Name
-                    </span>
-                )}
-                <Box style={{ fontWeight: "400", fontSize: "20px" }}>
-                    Phone Number*
-                </Box>
-                <TextField
-                    value={comment.phone}
-                    type="Number"
-                    name="phone"
-                    placeholder="Phone Number"
-                    fullWidth
-                    onChange={oninput}
-                />
-                {valid.phone == true && (
-                    <span
-                        style={{
-                            color: "red",
-                            fontWeight: "bold",
-                            fontSize: "15px",
-                            display: "flex",
-                            justifyContent: "center",
-                        }}
-                    >
-                        Enter Valid Number
-                    </span>
-                )}
-                <Box style={{ fontWeight: "400", fontSize: "20px" }}>
-                    Alternatvie Phone Number*
-                </Box>
-                <TextField
-                    value={comment.alternativephone}
-                    type="Number"
-                    name="alternativephone"
-                    placeholder="Alternative Phone Number"
-                    fullWidth
-                    onChange={oninput}
-                />
-                {valid.alternativephone == true && (
-                    <span
-                        style={{
-                            color: "red",
-                            fontWeight: "bold",
-                            fontSize: "15px",
-                            display: "flex",
-                            justifyContent: "center",
-                        }}
-                    >
-                        Enter Valid Alternative Number
-                    </span>
-                )}
-                {hide.alternativephone == true && (
-                    <span
-                        style={{
-                            color: "red",
-                            fontWeight: "bold",
-                            fontSize: "15px",
-                            display: "flex",
-                            justifyContent: "center",
-                        }}
-                    >
-                        Phone Number And Alternatvie number are Match
-                    </span>
-                )}
-                <Box style={{ fontWeight: "400", fontSize: "20px" }}>
-                    {" "}
-                    Email Address*
-                </Box>
-                <TextField
-                    id="outlined-basic"
-                    placeholder="Email Address"
-                    fullWidth
-                    onChange={oninput}
-                    value={comment.email}
-                    name="email"
-                />
-                {valid.email == true && (
-                    <span
-                        style={{
-                            color: "red",
-                            fontWeight: "bold",
-                            fontSize: "15px",
-                            display: "flex",
-                            justifyContent: "center",
-                        }}
-                    >
-                        Enter Valid email
-                    </span>
-                )}
-                {hide.email == true && (
-                    <span
-                        style={{
-                            color: "red",
-                            fontWeight: "bold",
-                            fontSize: "15px",
-                            display: "flex",
-                            justifyContent: "center",
-                        }}
-                    >
-                        Invlid Email Address
-                    </span>
-                )}
-                <FormControl fullWidth>
-                    <Box style={{ fontWeight: "400", fontSize: "20px" }}>
-                        Select State*
-                    </Box>
-                    <Select
-                        name="state"
-                        placeholder="Self Drive"
-                        onChange={oninput}
-                        value={comment.state}
-                    >
-
-                        {(data2 || []).map((u) => (
-                            <MenuItem value={u.state} >{u.state}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-                {valid.state == true && (
-                    <span
-                        style={{
-                            color: "red",
-                            fontWeight: "bold",
-                            fontSize: "15px",
-                            display: "flex",
-                            justifyContent: "center",
-                        }}
-                    >
-                        Select State
-                    </span>
-                )}
-                <Box style={{ fontWeight: "400", fontSize: "20px" }}> Licence Number*</Box>
-                <TextField
-                    name="licence"
-                    value={comment.licence}
-                    placeholder="Licence Number"
-                    fullWidth
-                    onChange={oninput}
-                />
-                {valid.licence == true && (
-                    <span
-                        style={{
-                            color: "red",
-                            fontWeight: "bold",
-                            fontSize: "15px",
-                            display: "flex",
-                            justifyContent: "center",
-                        }}
-                    >
-                        Enter licence Number
-                    </span>
-                )}
-                <Button
-                    className="btn"
-                    onClick={onSubmit}
-                    style={{
-                        backgroundColor: "#23809fc2",
-                        marginTop: "20px",
-                        color: "white",
-                    }}
-                >
-                    Submit
-                </Button>
-            </Grid>
-            <Footer />
-        </>
-    )
+  return (
+    <ThemeProvider theme={theme}>
+      <ToastContainer position="top-right" autoClose={5000} />
+      <Container component="main" maxWidth="xs">
+        <Box
+          sx={{
+            marginTop: 8,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Avatar sx={{ m: 1, bgcolor: "#23809fc2" }}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5" sx={{ color: "#23809fc2" }}>
+            Register Driver
+          </Typography>
+          {formError && (
+            <Typography style={{ color: "red" }}>
+              Please fill out all required fields.
+            </Typography>
+          )}
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="driver"
+            label="Driver"
+            name="driver"
+            autoComplete="driver"
+            autoFocus
+            onChange={handleChange}
+            value={user.driver}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
+            name="email"
+            autoComplete="email"
+            onChange={handleChange}
+            value={user.email}
+            error={!valid.email}
+            helperText={!valid.email && "Email is invalid"}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="phone"
+            label="Phone Number"
+            name="phone"
+            autoComplete="phone"
+            type="number"
+            onChange={handleChange}
+            value={user.phone}
+            error={!valid.phone}
+            helperText={!valid.phone && "Phone Number must be 10 digits"}
+          />
+          <TextField
+            margin="normal"
+            fullWidth
+            id="alternativePhone"
+            label="Alternative Phone Number"
+            name="alternativePhone"
+            autoComplete="alternativePhone"
+            type="number"
+            onChange={handleChange}
+            value={user.alternativePhone}
+            error={!valid.alternativePhone}
+            helperText={!valid.alternativePhone && "Phone Number must be 10 digits or leave empty"}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="state"
+            label="State"
+            name="state"
+            autoComplete="state"
+            onChange={handleChange}
+            value={user.state}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="licence"
+            label="Licence Number"
+            name="licence"
+            autoComplete="licence"
+            onChange={handleChange}
+            value={user.licence}
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2, bgcolor: "#23809fc2" }}
+            onClick={handleSubmit}
+          >
+            Register
+          </Button>
+        </Box>
+      </Container>
+    </ThemeProvider>
+  );
 }

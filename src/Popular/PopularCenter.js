@@ -1,22 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./Popular.css"
-import { Button } from "@mui/material";
+import { Button, TextField, FormControl, Select, MenuItem } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { makeStyles } from "@mui/styles";
 import Grid from "@mui/material/Grid";
 import { Box } from "@mui/system";
-import img from "../Image/nexon.jpg";
-import img1 from "../Image/harrier.jpg";
-import img2 from "../Image/punch.jpg";
-import img3 from "../Image/seltos.jpg";
-import img4 from "../Image/xuv.jpg";
-import img5 from "../Image/thar.png";
-import img6 from "../Image/Innova.jpg";
-import img7 from "../Image/benz.jpg";
-import img8 from "../Image/kiacarnival.jpg";
-import img9 from "../Image/Safari.jpg";
-import img10 from "../Image/verna.jpg";
-import img11 from "../Image/Skoda.jpg";
+import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
   color: {
@@ -57,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#23809fc2",
     color: "#fff !important",
     boxShadow: "5px 5px 3px rgb(0 0 0 / 15%), -5px -5px 3px rgb(0 0 0 / 15%)",
-    padding:"10px"
+    padding: "10px"
   },
   imgmain: {
     display: "flex",
@@ -81,9 +70,70 @@ const useStyles = makeStyles((theme) => ({
 export default function PopularCenter() {
   const classes = useStyles();
   const navigate = useNavigate();
+  const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [filters, setFilters] = useState({
+    sortBy: "",
+    search: "",
+    carType: "",
+  });
+
+  const fetchData = async () => {
+    try {
+      const { data: response } = await axios.get(
+        "http://localhost:8000/api/getAllCar"
+      );
+      setData(response.cars);
+      setFilteredData(response.cars);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const applyFilters = () => {
+    let filteredCars = [...data];
+
+    if (filters.sortBy === "highToLow") {
+      filteredCars.sort((a, b) => b.pricePerHour - a.pricePerHour);
+    } else if (filters.sortBy === "lowToHigh") {
+      filteredCars.sort((a, b) => a.pricePerHour - b.pricePerHour);
+    }
+
+    if (filters.search) {
+      filteredCars = filteredCars.filter((car) =>
+        car.carname.toLowerCase().includes(filters.search.toLowerCase())
+      );
+    }
+
+    if (filters.carType) {
+      filteredCars = filteredCars.filter((car) =>
+        car.carType.toLowerCase() === filters.carType.toLowerCase()
+      );
+    }
+
+    setFilteredData(filteredCars);
+  };
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [name]: value,
+    }));
+  };
+
+  useEffect(() => {
+    applyFilters();
+  }, [filters, data]);
+
   const Onpush = () => {
     navigate("/FeedBack");
   };
+
   const navigatetobook = () => {
     navigate("/Book");
   };
@@ -96,128 +146,65 @@ export default function PopularCenter() {
         </Box>
       </Grid>
 
+      <Grid className="container mx-auto" container justifyContent="center" spacing={2} style={{ marginBottom: "20px" }}>
+        <Grid item xs={12} sm={6} md={4}>
+          <FormControl fullWidth>
+            <Select
+              value={filters.sortBy}
+              onChange={handleFilterChange}
+              displayEmpty
+              name="sortBy"
+            >
+              <MenuItem value="">Sort By</MenuItem>
+              <MenuItem value="highToLow">Price: High to Low</MenuItem>
+              <MenuItem value="lowToHigh">Price: Low to High</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <TextField
+            fullWidth
+            value={filters.search}
+            onChange={handleFilterChange}
+            name="search"
+            label="Search Car Name"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <FormControl fullWidth>
+            <Select
+              value={filters.carType}
+              onChange={handleFilterChange}
+              name="carType"
+              displayEmpty
+              inputProps={{ 'aria-label': 'Select car type' }}
+            >
+              <MenuItem value="">Car Type</MenuItem>
+              <MenuItem value="Hatchback">Hatchback</MenuItem>
+              <MenuItem value="Premium">Premium</MenuItem>
+              <MenuItem value="Luxury">Luxury</MenuItem>
+              <MenuItem value="Sedan">Sedan</MenuItem>
+              <MenuItem value="SUV/MUV">SUV</MenuItem>
+            </Select>
+          </FormControl>
+
+        </Grid>
+      </Grid>
+
       <Grid spacing={3}>
         <Grid className={classes.imgmain} >
-          <Grid className="imgg" onClick={navigatetobook}>
-            <img src={img} alt="Girl in a jacket" className="imgcr" />
-            <Grid className={classes.cartext}>
-              <Box sx={{ fontSize: "20px" }}> Tata Nexon Car  4+1</Box>
-              <Box> AC</Box>
-              <Box> GPS Fitted</Box>
-              <Box>700 KM/Day</Box>
-              <Box> Well Maintained Cars</Box>
+          {filteredData?.map((row, i) => (
+            <Grid className="imgg" onClick={navigatetobook}>
+              <img src={row?.image} alt="Girl in a jacket" className="imgcr" />
+              <Grid className={classes.cartext}>
+                <Box sx={{ fontSize: "20px" }}>{row?.carname}</Box>
+                <Box>{row?.carType}</Box>
+                <Box>{row?.fuelType}</Box>
+                <Box>{row?.platnumber}</Box>
+                <Box>{row?.pricePerHour}</Box>
+              </Grid>
             </Grid>
-          </Grid>
-          <Grid className="imgg" onClick={navigatetobook}>
-            <img src={img1} alt="Girl in a jacket" className="imgcr" />
-            <Grid className={classes.cartext}>
-              <Box sx={{ fontSize: "20px" }}>Tata harrier  4+1</Box>
-              <Box> AC</Box>
-              <Box> GPS Fitted</Box>
-              <Box>599 KM/Day</Box>
-              <Box> Excellent engine economy</Box>
-            </Grid>
-          </Grid>
-          <Grid className="imgg" onClick={navigatetobook}>
-            <img src={img2} alt="Girl in a jacket" className="imgcr" />
-            <Grid className={classes.cartext}>
-              <Box sx={{ fontSize: "20px" }}>Tata Punch  3+1</Box>
-              <Box> AC</Box>
-              <Box> GPS Fitted</Box>
-              <Box>600 KM/Day</Box>
-              <Box>Impressive performance</Box>
-            </Grid>
-          </Grid>
-          <Grid className="imgg" onClick={navigatetobook}>
-            <img src={img3} alt="Girl in a jacket" className="imgcr" />
-            <Grid className={classes.cartext}>
-              <Box sx={{ fontSize: "20px" }}>Kia seltos  3+1</Box>
-              <Box> AC</Box>
-              <Box> GPS Fitted</Box>
-              <Box>673 KM/Day</Box>
-              <Box>Great frugal fuel economy</Box>
-            </Grid>
-          </Grid>
-          <Grid className="imgg" onClick={navigatetobook}>
-            <img src={img5} alt="Girl in a jacket" className="imgcr" />
-            <Grid className={classes.cartext}>
-              <Box sx={{ fontSize: "20px" }}>Mahindra Thar  3+1</Box>
-              <Box> AC</Box>
-              <Box> GPS Fitted</Box>
-              <Box>346 KM/Day</Box>
-              <Box>Safety features including</Box>
-            </Grid>
-          </Grid>
-          <Grid className="imgg" onClick={navigatetobook}>
-            <img src={img4} alt="Girl in a jacket" className="imgcr" />
-            <Grid className={classes.cartext}>
-              <Box sx={{ fontSize: "20px" }}>Mahindra XUV700  4+1</Box>
-              <Box> AC</Box>
-              <Box> GPS Fitted</Box>
-              <Box>490 KM/Day</Box>
-              <Box>Comfortable driving experience</Box>
-            </Grid>
-          </Grid>
-          <Grid className="imgg">
-            <img src={img7} alt="Girl in a jacket" className="imgcr" />
-            <Grid className={classes.cartext}>
-              <Box sx={{ fontSize: "20px" }}>Mercedes Benz  6+1</Box>
-              <Box> AC</Box>
-              <Box> GPS Fitted</Box>
-              <Box>800 KM/Day</Box>
-              <Box>All-electric range of 40 miles</Box>
-            </Grid>
-          </Grid>
-          <Grid className="imgg" onClick={navigatetobook}>
-            <img src={img6} alt="Girl in a jacket" className="imgcr" />
-            <Grid className={classes.cartext}>
-              <Box sx={{ fontSize: "20px" }}>Innova  6+1</Box>
-              <Box>AC</Box>
-              <Box> GPS Fitted</Box>
-              <Box>793 KM/Day</Box>
-              <Box>5-star safety rating</Box>
-            </Grid>
-          </Grid>
-          <Grid className="imgg" onClick={navigatetobook}>
-            <img src={img8} alt="Girl in a jacket" className="imgcr" />
-            <Grid className={classes.cartext}>
-              <Box sx={{ fontSize: "20px" }}>Kia Carnival 6+1</Box>
-              <Box> AC</Box>
-              <Box> GPS Fitted</Box>
-              <Box>500 KM/Day</Box>
-              <Box>Automatic emergency braking</Box>
-            </Grid>
-          </Grid>
-          <Grid className="imgg" onClick={navigatetobook}>
-            <img src={img9} alt="Girl in a jacket" className="imgcr" />
-            <Grid className={classes.cartext}>
-              <Box sx={{ fontSize: "20px" }}>Tata Safari  6+1</Box>
-              <Box> AC</Box>
-              <Box> GPS Fitted</Box>
-              <Box>900 KM/Day</Box>
-              <Box>Ambient Lighting</Box>
-            </Grid>
-          </Grid>
-          <Grid className="imgg" onClick={navigatetobook}>
-            <img src={img10} alt="Girl in a jacket" className="imgcr" />
-            <Grid className={classes.cartext}>
-              <Box sx={{ fontSize: "20px" }}>Hyundai Verna 4+1</Box>
-              <Box> AC</Box>
-              <Box> GPS Fitted</Box>
-              <Box>800 KM/Day</Box>
-              <Box>Reversing Camera</Box>
-            </Grid>
-          </Grid>
-          <Grid className="imgg" onClick={navigatetobook}>
-            <img src={img11} alt="Girl in a jacket" className="imgcr" />
-            <Grid className={classes.cartext}>
-              <Box sx={{ fontSize: "20px" }}>Skoda Slavia  4+1</Box>
-              <Box> AC</Box>
-              <Box> GPS Fitted</Box>
-              <Box>200 KM/Day</Box>
-              <Box>Panoramic Sunroof</Box>
-            </Grid>
-          </Grid>
+          ))}
         </Grid>
       </Grid>
       <Grid className="bcimg">
